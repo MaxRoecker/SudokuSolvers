@@ -28,7 +28,7 @@ public final class Frame {
     public final Element[] getElementsOfRow(int row){
         if (row < 0 || row >= FRAME_SIZE)
             throw new AssertionError("Row must be greater or equal to zero and less than " + FRAME_SIZE);
-        return this.getElements()[row];
+        return this.getElements()[row].clone();
     }
 
     /**
