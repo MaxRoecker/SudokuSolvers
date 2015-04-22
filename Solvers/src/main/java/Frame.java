@@ -17,6 +17,34 @@ public final class Frame {
         this.elements = elements;
     }
 
+    public final Element[][] getElements(){
+        return this.elements;
+    }
+
+    /**
+     * @param row {@code int} row of the frame.
+     * @return Array of {@link Element} of the row.
+     */
+    public final Element[] getElementsOfRow(int row){
+        if (row < 0 || row >= FRAME_SIZE)
+            throw new AssertionError("Row must be greater or equal to zero and less than " + FRAME_SIZE);
+        return this.getElements()[row];
+    }
+
+    /**
+     * @param column {@code int} column of the frame.
+     * @return Array of {@link Element} of the column.
+     */
+    public final Element[] getElementsOfColumn(int column){
+        if (column < 0 || column >= FRAME_SIZE)
+            throw new AssertionError("Column must be greater or equal to zero and less than " + FRAME_SIZE);
+        Element[] elements = new Element[FRAME_SIZE];
+        for (int i = 0; i < FRAME_SIZE; i++) {
+            elements[i] = this.elements[i][column];
+        }
+        return elements;
+    }
+
     /**
      * @param element {@link Element} instance.
      * @param row     {@code byte} value of the row of the frame.
