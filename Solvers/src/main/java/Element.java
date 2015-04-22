@@ -1,3 +1,4 @@
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -17,13 +18,12 @@ public final class Element implements Comparable<Element>{
     private final boolean fixed;
 
     public Element(byte value) {
-        if(value != EMPTY_VALUE)
-            if (!((value >= MIN_VALUE) && (value <= MAX_VALUE))) throw new AssertionError();
-        this.value = value;
-        this.fixed = false;
+        this(value,false);
     }
 
     public Element(byte value, boolean fixed) {
+        if(value != EMPTY_VALUE)
+            if (!((value >= MIN_VALUE) && (value <= MAX_VALUE))) throw new AssertionError(INVALID_ELEMENT_VALUE_MESSAGE);
         this.value = value;
         this.fixed = fixed;
     }
