@@ -19,15 +19,15 @@ public final class Frame {
 
     /**
      * @param element {@link Element} instance.
-     * @param row {@code byte} value of the row of the frame.
+     * @param row     {@code byte} value of the row of the frame.
      * @return {@code true} if the {@code element} is present in the {@code row}, {@code false} otherwise.
      */
-    public final boolean inRow(Element element, byte row) {
+    public final boolean inRow(Element element, int row) {
         if (element == null) throw new AssertionError("Element must not be null.");
         if (row < 0 || row >= FRAME_SIZE)
             throw new AssertionError("Row must be greater or equal to zero and less than " + FRAME_SIZE);
         for (int i = 0; i < elements[row].length; i++) {
-            if(elements[row][i].equals(element))
+            if (elements[row][i].equals(element))
                 return true;
         }
         return false;
@@ -35,10 +35,10 @@ public final class Frame {
 
     /**
      * @param element {@link Element} instance.
-     * @param column {@code byte} value of the row of the frame.
+     * @param column  {@code byte} value of the row of the frame.
      * @return {@code true} if the {@code element} is present in the {@code column}, {@code false} otherwise.
      */
-    public final boolean inColumn(Element element, byte column) {
+    public final boolean inColumn(Element element, int column) {
         if (element == null) throw new AssertionError("Element must not be null.");
         if (column < 0 || column >= FRAME_SIZE)
             throw new AssertionError("Column must be greater or equal to zero and less than " + FRAME_SIZE);
@@ -54,24 +54,25 @@ public final class Frame {
      *
      * @return {@code true} if the Frame is valid, {@code false} otherwise.
      */
-    public final boolean isValid(){
+    public final boolean isValid() {
         for (int i = 0; i < FRAME_SIZE * FRAME_SIZE; i++) {
             int originRow = i / FRAME_SIZE;
             int originColumn = i % FRAME_SIZE;
             Element origin = elements[originRow][originColumn];
+            if (origin.getValue() == Element.EMPTY_VALUE) {
+                return false;
+            }
             for (int j = i + 1; j < FRAME_SIZE * FRAME_SIZE; j++) {
                 int destRow = j / FRAME_SIZE;
                 int destColumn = j % FRAME_SIZE;
                 Element dest = elements[destRow][destColumn];
-                if(origin.equals(dest)){
+                if (origin.equals(dest) || (dest.getValue() == Element.EMPTY_VALUE)) {
                     return false;
                 }
             }
         }
         return true;
     }
-
-
 
 
 }
