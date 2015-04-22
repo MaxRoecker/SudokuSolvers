@@ -64,4 +64,9 @@ public final class Element implements Comparable<Element>{
                 .append(getValue())
                 .toHashCode();
     }
+
+    @Override
+    public String toString(){
+        return String.valueOf(this.value);
+    }
 }
