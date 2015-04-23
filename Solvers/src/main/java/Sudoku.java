@@ -1,3 +1,5 @@
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * <p>
  * </p>
@@ -18,14 +20,87 @@ public final class Sudoku {
         this.frames = frames;
     }
 
-    public boolean isRowValid(byte row) {
-        if (row < 0 || row >= SUDOKU_ELEMENT_SIZE)
-            throw new AssertionError("Row must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+    /**
+     * TODO Terminar isso aqui.
+     * @param elementColumn
+     * @return
+     */
+    public boolean isColumnValid(byte elementColumn){
         return true;
     }
 
-    private Frame[] framesOfRow(byte row) {
-        return frames[row / SUDOKU_FRAME_SIZE];
+    /**
+     * @param elementRow {@code int} of the row.
+     * @return {@code true} if the row of {@link Element} is valid, {@code false} otherwise.
+     */
+    public boolean isRowValid(byte elementRow) {
+        if (elementRow < 0 || elementRow >= SUDOKU_ELEMENT_SIZE)
+            throw new AssertionError("Row must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+        Element[] elements = elementsOfRow(elementRow);
+        for (int i = 0; i < elements.length; i++) {
+            Element element = elements[i];
+            for (int j = i; j < elements.length; j++) {
+                if (element.equals(elements[j]))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param elementRow Index of row.
+     * @return Array of {@link Frame} in the row.
+     */
+    public Frame[] framesByRow(int elementRow) {
+        if (elementRow < 0 || elementRow >= SUDOKU_ELEMENT_SIZE)
+            throw new AssertionError("Row must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+        return frames[elementRow / SUDOKU_FRAME_SIZE];
+    }
+
+    /**
+     * TODO terminar isso aqui
+     * @param elementColumn Index of column.
+     * @return Array of {@link Frame} in the column.
+     */
+    public Frame[] framesByColumn(int elementColumn){
+        if (elementColumn < 0 || elementColumn >= SUDOKU_ELEMENT_SIZE)
+            throw new AssertionError("Column must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+        Frame[] frames = new Frame[SUDOKU_FRAME_SIZE];
+        for (int i = 0; i < frames.length; i++) {
+            frames[i] = this.frames[i][elementColumn / SUDOKU_FRAME_SIZE];
+        }
+        return frames;
+    }
+
+    /**
+     * @param elementRow Index of the row.
+     * @return Array of {@link Element} in the row.
+     */
+    public Element[] elementsOfRow(int elementRow) {
+        if (elementRow < 0 || elementRow >= SUDOKU_ELEMENT_SIZE)
+            throw new AssertionError("Row must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+        Frame[] frames = framesByRow(elementRow);
+        Element[] rowElements = {};
+        for (Frame frame : frames) {
+            rowElements = ArrayUtils.addAll(rowElements, frame.getElementsOfRow(elementRow % SUDOKU_FRAME_SIZE));
+        }
+        return rowElements;
+    }
+
+    /**
+     * TODO Terminar isso aqui
+     * @param elementColumn Index of the column.
+     * @return Array of {@link Element} in the column.
+     */
+    public Element[] elementsOfColumn(int elementColumn) {
+        if (elementColumn < 0 || elementColumn >= SUDOKU_ELEMENT_SIZE)
+            throw new AssertionError("Column must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+        Frame[] frames = framesByRow(elementColumn);
+        Element[] rowElements = {};
+        for (Frame frame : frames) {
+            rowElements = ArrayUtils.addAll(rowElements, frame.getElementsOfRow(elementColumn % SUDOKU_FRAME_SIZE));
+        }
+        return rowElements;
     }
 
     public final void print() {
@@ -53,10 +128,6 @@ public final class Sudoku {
             System.out.println();
         }
     }
-
-
-
-
 
 
 }
