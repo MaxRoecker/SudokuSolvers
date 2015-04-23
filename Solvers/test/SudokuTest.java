@@ -23,7 +23,7 @@ public class SudokuTest {
         }
 
         Sudoku sudoku = new Sudoku(frames);
-        sudoku.print();
+        //sudoku.print();
     }
 
 }
