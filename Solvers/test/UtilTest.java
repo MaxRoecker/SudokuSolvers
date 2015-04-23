@@ -1,3 +1,5 @@
+import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -5,5 +7,11 @@ import static org.junit.Assert.*;
  */
 public class UtilTest {
 
+    @Test
+    public void testReadFromFile(){
+        Frame[][] frames = Util.readFromFile("teste.txt");
+        Sudoku sudoku = new Sudoku(frames);
+        sudoku.print();
 
+    }
 }

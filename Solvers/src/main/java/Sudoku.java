@@ -44,7 +44,7 @@ public final class Sudoku {
                 for (int k = 0; k < Frame.FRAME_SIZE; k++) {
                     System.out.print(elementsFrame2[k] + " ");
                 }
-                System.out.print("  ");
+                System.out.print(" ");
                 for (int k = 0; k < Frame.FRAME_SIZE; k++) {
                     System.out.print(elementsFrame3[k] + " ");
                 }
