@@ -9,12 +9,15 @@ public final class Frame {
 
     private final Element[][] elements;
 
+
     public Frame(Element[][] elements) {
         if (elements.length != FRAME_SIZE) throw new AssertionError(INVALID_FRAME_SIZE_MESSAGE);
         for (Element[] elements1 : elements) {
             if (elements1.length != FRAME_SIZE) throw new AssertionError(INVALID_FRAME_SIZE_MESSAGE);
         }
+
         this.elements = elements;
+
     }
 
     public final Element[][] getElements(){
