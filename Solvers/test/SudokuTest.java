@@ -81,8 +81,6 @@ public class SudokuTest {
         Sudoku sudokuValid = new Sudoku(validFrames);
         Sudoku sudokuInvalid = new Sudoku(invalidFrames);
 
-        Sudoku sudoku = new Sudoku(frames);
-        //sudoku.print();
         assertTrue(sudokuValid.isRowValid(0));
         assertFalse(sudokuInvalid.isRowValid(0));
     }
