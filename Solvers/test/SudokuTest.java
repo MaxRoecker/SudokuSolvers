@@ -86,6 +86,17 @@ public class SudokuTest {
     }
 
     @Test
+    public void testNumberOfElements() throws Exception{
+        Sudoku sudokuValid = new Sudoku(validFrames);
+
+        int[] numbersofElementValid = {0,9,9,9,9,9,9,9,9,9};
+        int[] numbersofElementInvalid = {1,9,9,9,9,8,9,9,9,9};
+
+        assertTrue(Arrays.equals(sudokuValid.getNumberOfElements(),numbersofElementValid));
+        assertFalse(Arrays.equals(sudokuValid.getNumberOfElements(),numbersofElementInvalid));
+    }
+
+    @Test
     public void testIsColumnValid() throws Exception {
         Sudoku sudokuValid = new Sudoku(validFrames);
         Sudoku sudokuInvalid = new Sudoku(invalidFrames);

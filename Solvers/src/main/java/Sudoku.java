@@ -11,7 +11,7 @@ public final class Sudoku {
     private static final String INVALID_SUDOKU_INSTANCE = "Invalid Sudoku instance";
 
     private final Frame[][] frames;
-    private final int[] numberOfElements  = new int[SUDOKU_ELEMENT_SIZE + 1];;
+    private final int[] numberOfElements  = new int[SUDOKU_ELEMENT_SIZE + 1];
 
     public Sudoku(Frame[][] frames) {
         if (frames.length != SUDOKU_FRAME_SIZE) throw new AssertionError(INVALID_SUDOKU_INSTANCE);
@@ -33,6 +33,13 @@ public final class Sudoku {
                 }
             }
         }
+    }
+
+    /**
+     * @return array of numbers of elements in Sudoku, the index of array represents the element of Sudoku
+     */
+    public int[] getNumberOfElements() {
+        return numberOfElements;
     }
 
     public boolean isValid(){
