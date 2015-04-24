@@ -20,12 +20,17 @@ public final class Sudoku {
         this.frames = frames;
     }
 
-    /**
-     * TODO Terminar isso aqui.
-     * @param elementColumn
-     * @return
-     */
-    public boolean isColumnValid(byte elementColumn){
+    public boolean isValid(){
+        for(Frame[] frames : this.frames)
+            for(Frame frame : frames){
+                if(!frame.isValid()){
+                    return false;
+                }
+            }
+        for (int i = 0; i < SUDOKU_ELEMENT_SIZE; i++) {
+            if( (!this.isRowValid(i)) || (!this.isColumnValid(i)))
+                return false;
+        }
         return true;
     }
 
@@ -33,13 +38,31 @@ public final class Sudoku {
      * @param elementRow {@code int} of the row.
      * @return {@code true} if the row of {@link Element} is valid, {@code false} otherwise.
      */
-    public boolean isRowValid(byte elementRow) {
+    public boolean isRowValid(int elementRow) {
         if (elementRow < 0 || elementRow >= SUDOKU_ELEMENT_SIZE)
             throw new AssertionError("Row must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
         Element[] elements = elementsOfRow(elementRow);
         for (int i = 0; i < elements.length; i++) {
             Element element = elements[i];
-            for (int j = i; j < elements.length; j++) {
+            for (int j = i + 1; j < elements.length; j++) {
+                if (element.equals(elements[j]))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param elementColumn {@code int} of the column.
+     * @return {@code true} if the column of {@link Element} is valid, {@code false} otherwise.
+     */
+    public boolean isColumnValid(int elementColumn){
+        if (elementColumn < 0 || elementColumn >= SUDOKU_ELEMENT_SIZE)
+            throw new AssertionError("Row must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
+        Element[] elements = elementsOfColumn(elementColumn);
+        for (int i = 0; i < elements.length; i++) {
+            Element element = elements[i];
+            for (int j = i + 1; j < elements.length; j++) {
                 if (element.equals(elements[j]))
                     return false;
             }
@@ -58,7 +81,6 @@ public final class Sudoku {
     }
 
     /**
-     * TODO terminar isso aqui
      * @param elementColumn Index of column.
      * @return Array of {@link Frame} in the column.
      */
@@ -88,22 +110,24 @@ public final class Sudoku {
     }
 
     /**
-     * TODO Terminar isso aqui
      * @param elementColumn Index of the column.
      * @return Array of {@link Element} in the column.
      */
     public Element[] elementsOfColumn(int elementColumn) {
         if (elementColumn < 0 || elementColumn >= SUDOKU_ELEMENT_SIZE)
             throw new AssertionError("Column must be greater or equal to zero and less than " + SUDOKU_ELEMENT_SIZE);
-        Frame[] frames = framesByRow(elementColumn);
+        Frame[] frames = framesByColumn(elementColumn);
         Element[] rowElements = {};
         for (Frame frame : frames) {
-            rowElements = ArrayUtils.addAll(rowElements, frame.getElementsOfRow(elementColumn % SUDOKU_FRAME_SIZE));
+            rowElements = ArrayUtils.addAll(rowElements, frame.getElementsOfColumn(elementColumn % SUDOKU_FRAME_SIZE));
         }
         return rowElements;
     }
 
-    public final void print() {
+    /**
+     * Prints the {@link Sudoku} instance in a human-readable way in the screen.
+     */
+    public final void prettyPrint() {
         for (int i = 0; i < SUDOKU_FRAME_SIZE; i++) {
             Frame frame1 = this.frames[i][0];
             Frame frame2 = this.frames[i][1];

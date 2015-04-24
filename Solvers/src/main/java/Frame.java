@@ -1,3 +1,8 @@
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.Arrays;
+
 /**
  * <p>
  * </p>
@@ -102,5 +107,36 @@ public final class Frame {
         return true;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Element[] elements : this.getElements()){
+            for (Element element : elements){
+                stringBuilder.append(element.toString() + " ");
+            }
+            stringBuilder.append("\n");
+        }
 
+        return stringBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Frame frame = (Frame) o;
+
+        return new EqualsBuilder()
+                .append(getElements(), frame.getElements())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getElements())
+                .toHashCode();
+    }
 }
