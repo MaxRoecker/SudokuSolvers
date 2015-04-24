@@ -33,7 +33,7 @@ public class Util {
             result = result.substring(0, result.lastIndexOf(" - "));
             return result;
         } catch (Exception e) {
-            System.out.println("Read file error! " + e.getMessage());
+            System.err.println("Read file error! " + e.getMessage());
         }
         return null;
     }
@@ -73,7 +73,7 @@ public class Util {
             }
             return frames;
         } catch (Exception e) {
-            System.out.println("Open File Error! " + e.getMessage());
+            System.err.println("Open File Error! " + e.getMessage());
         }
         return null;
     }

@@ -11,6 +11,7 @@ public final class Sudoku {
     private static final String INVALID_SUDOKU_INSTANCE = "Invalid Sudoku instance";
 
     private final Frame[][] frames;
+    private final int[] numberOfElements  = new int[SUDOKU_ELEMENT_SIZE + 1];;
 
     public Sudoku(Frame[][] frames) {
         if (frames.length != SUDOKU_FRAME_SIZE) throw new AssertionError(INVALID_SUDOKU_INSTANCE);
@@ -18,6 +19,20 @@ public final class Sudoku {
             if (frames1.length != SUDOKU_FRAME_SIZE) throw new AssertionError(INVALID_SUDOKU_INSTANCE);
         }
         this.frames = frames;
+
+        for (int i = 0; i < this.numberOfElements.length; i++) {
+            this.numberOfElements[i] = 0;
+        }
+
+        for (Frame[] frames1 : this.frames) {
+            for (Frame frame : frames1) {
+                for (Element[] elements : frame.getElements()){
+                    for (Element element : elements){
+                        this.numberOfElements[((int) element.getValue())]++;
+                    }
+                }
+            }
+        }
     }
 
     public boolean isValid(){

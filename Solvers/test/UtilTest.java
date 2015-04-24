@@ -7,7 +7,7 @@ public class UtilTest {
 
     /*@Test
     public void testReadFromFile(){
-        Frame[][] frames = Util.readFromFile("teste.txt");
+        Frame[][] frames = Util.readFromFile("easy.txt");
         Sudoku sudoku = new Sudoku(frames);
         sudoku.prettyPrint();
 
