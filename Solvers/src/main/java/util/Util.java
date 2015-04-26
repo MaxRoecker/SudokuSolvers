@@ -1,3 +1,9 @@
+package util;
+
+import model.Element;
+import model.Frame;
+import model.Sudoku;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 

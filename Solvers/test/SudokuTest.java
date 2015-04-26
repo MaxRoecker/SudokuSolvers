@@ -1,4 +1,6 @@
-import org.apache.commons.lang3.ArrayUtils;
+import model.Element;
+import model.Frame;
+import model.Sudoku;
 import org.junit.Test;
 
 import java.util.Arrays;

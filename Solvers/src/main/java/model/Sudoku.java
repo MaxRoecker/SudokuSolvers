@@ -1,3 +1,5 @@
+package model;
+
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -8,10 +10,10 @@ import org.apache.commons.lang3.ArrayUtils;
 public final class Sudoku {
     public static final byte SUDOKU_FRAME_SIZE = 3;
     public static final byte SUDOKU_ELEMENT_SIZE = 9;
-    private static final String INVALID_SUDOKU_INSTANCE = "Invalid Sudoku instance";
+    private static final String INVALID_SUDOKU_INSTANCE = "Invalid model.Sudoku instance";
 
     private final Frame[][] frames;
-    private final int[] numberOfElements  = new int[SUDOKU_ELEMENT_SIZE + 1];;
+    private final int[] numberOfElements  = new int[SUDOKU_ELEMENT_SIZE + 1];
 
     public Sudoku(Frame[][] frames) {
         if (frames.length != SUDOKU_FRAME_SIZE) throw new AssertionError(INVALID_SUDOKU_INSTANCE);

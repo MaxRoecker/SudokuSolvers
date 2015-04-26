@@ -1,4 +1,5 @@
-import org.apache.commons.lang3.ArrayUtils;
+import model.Element;
+import model.Frame;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -10,7 +11,7 @@ import static org.junit.Assert.*;
  * </p>
  * <p>Created at 2015-04-22 13-06.</p>
  */
-public class FrameTest {
+public class RegionTest {
 
     Element[][] validFrameElements = {
             {new Element((byte) 1), new Element((byte) 2), new Element((byte) 3)},

@@ -1,7 +1,7 @@
+package model;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import java.util.Arrays;
 
 /**
  * <p>
@@ -59,7 +59,7 @@ public final class Frame {
      * @return {@code true} if the {@code element} is present in the {@code row}, {@code false} otherwise.
      */
     public final boolean inRow(Element element, int row) {
-        if (element == null) throw new AssertionError("Element must not be null.");
+        if (element == null) throw new AssertionError("model.Element must not be null.");
         if (row < 0 || row >= FRAME_SIZE)
             throw new AssertionError("Row must be greater or equal to zero and less than " + FRAME_SIZE);
         for (int i = 0; i < elements[row].length; i++) {
@@ -75,7 +75,7 @@ public final class Frame {
      * @return {@code true} if the {@code element} is present in the {@code column}, {@code false} otherwise.
      */
     public final boolean inColumn(Element element, int column) {
-        if (element == null) throw new AssertionError("Element must not be null.");
+        if (element == null) throw new AssertionError("model.Element must not be null.");
         if (column < 0 || column >= FRAME_SIZE)
             throw new AssertionError("Column must be greater or equal to zero and less than " + FRAME_SIZE);
         for (Element[] element1 : elements) {
@@ -88,7 +88,7 @@ public final class Frame {
     /**
      * Verify if all the elements in frame are different.
      *
-     * @return {@code true} if the Frame is valid, {@code false} otherwise.
+     * @return {@code true} if the model.Frame is valid, {@code false} otherwise.
      */
     public final boolean isValid() {
         for (int i = 0; i < FRAME_SIZE * FRAME_SIZE; i++) {

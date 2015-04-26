@@ -1,14 +1,15 @@
-import com.sun.istack.internal.NotNull;
+package model;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * <p>
- *     Represents a element of a frame inside a Sudoku board.
+ *     Represents a element of a frame inside a model.Sudoku board.
  * </p>
  * <p>Created at 2015-04-22 10-13.</p>
  */
-public final class Element implements Comparable<Element>{
+public class Element{
     public static final byte EMPTY_VALUE = 0;
     public static final byte MIN_VALUE = 1;
     public static final byte MAX_VALUE = 9;
@@ -28,25 +29,20 @@ public final class Element implements Comparable<Element>{
         this.fixed = fixed;
     }
 
-    public byte getValue() {
+    public final byte getValue() {
         return value;
     }
 
-    public boolean isEmpty(){
+    public final boolean isEmpty(){
         return this.getValue() == EMPTY_VALUE;
     }
 
-    public boolean isFixed() {
+    public final boolean isFixed() {
         return fixed;
     }
 
     @Override
-    public int compareTo(Element o) {
-        return this.getValue() - o.getValue();
-    }
-
-    @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
@@ -59,14 +55,14 @@ public final class Element implements Comparable<Element>{
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(getValue())
                 .toHashCode();
     }
 
     @Override
-    public String toString(){
+    public final String toString(){
         return String.valueOf(this.value);
     }
 }
