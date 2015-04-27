@@ -1,2 +1,2 @@
 # SudokuSolvers
-Solvers of Sudoku instances based on informed search, genetic algorithm and PSR search.
+Solvers of model.Sudoku instances based on informed search, genetic algorithm and PSR search.
