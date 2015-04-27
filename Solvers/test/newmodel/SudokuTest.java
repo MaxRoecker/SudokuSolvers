@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 public class SudokuTest {
 
     int[] validValues = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            1, 2, 3, 4, 5, 6, 7, 8, 1,
             7, 8, 9, 1, 2, 3, 4, 5, 6,
             4, 5, 6, 7, 8, 9, 1, 2, 3,
 
@@ -47,6 +47,19 @@ public class SudokuTest {
         Sudoku sudoku = new Sudoku(3, validValues);
         for (int i = 0; i < 9; i++) {
             assertTrue(sudoku.isCellColumnValid(i));
+        }
+    }
+
+    @Test
+    public void testCellsRelationByCell() throws Exception{
+        Sudoku sudoku = new Sudoku(3, validValues);
+        Sudoku.Cell cell = new Sudoku.Cell(6,6,5);
+        Sudoku.Cell[] cells = sudoku.cellsRegionByCell(cell);
+        int index = 0;
+        for (int i = 6; i < 9; i++) {
+            for (int j = 6; j < 9; j++) {
+                assertEquals(sudoku.getCells()[i][j],cells[index++]);
+            }
         }
     }
 
@@ -89,15 +102,5 @@ public class SudokuTest {
         assertEquals(validValues[18],regionRelations[5].getValue());
         assertEquals(validValues[19],regionRelations[6].getValue());
         assertEquals(validValues[20], regionRelations[7].getValue());
-    }
-
-    @Test
-    public void testGetRelations() throws Exception{
-        Sudoku sudoku = new Sudoku(3, validValues);
-        Sudoku.Cell cell = new Sudoku.Cell(0,0,1);
-        Sudoku.Cell[] relations = sudoku.getRelations(cell);
-        for (Sudoku.Cell relation : relations) {
-            System.out.println(relation.getValue());
-        }
     }
 }

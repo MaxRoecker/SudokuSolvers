@@ -86,13 +86,13 @@ public class Sudoku {
         for (int l = (cell.getCellRow() / order) * order; l < (((cell.getCellRow() / order) * order) + order); l++) {
             if (l != cell.getCellRow()) {
                 for (int m = (cell.getCellColumn() / order) * order; m < (((cell.getCellColumn() / order) * order) + order); m++) {
-                    if (m != cell.getCellColumn()){
+                    if (m != cell.getCellColumn()) {
                         subRegionRelations[index++] = this.cells[l][m];
                     }
                 }
             }
         }
-        return ArrayUtils.addAll(result,subRegionRelations);
+        return ArrayUtils.addAll(result, subRegionRelations);
     }
 
 
@@ -116,6 +116,17 @@ public class Sudoku {
         return cells;
     }
 
+    public Cell[] cellsRegionByCell(Cell cell) {
+        Cell[] cells = new Cell[this.order * this.order];
+        int index = 0;
+        for (int l = (cell.getCellRow() / order) * order; l < (((cell.getCellRow() / order) * order) + order); l++) {
+            for (int m = (cell.getCellColumn() / order) * order; m < (((cell.getCellColumn() / order) * order) + order); m++) {
+                cells[index++] = this.cells[l][m];
+            }
+        }
+        return cells;
+    }
+
     public boolean isCellRowValid(int cellRow) {
         return isCellArrayValid(cellsByRow(cellRow));
     }
@@ -127,23 +138,50 @@ public class Sudoku {
     private boolean isCellArrayValid(Cell[] cells) {
         for (int i = 0; i < cells.length; i++)
             for (int j = i + 1; j < cells.length; j++)
-                if (cells[i].equals(cells[j]))
+                if (cells[i].getValue() == (cells[j].getValue()))
                     return false;
         return true;
     }
 
-    /**
-     * TODO
-     *
-     * @return
-     */
-    public final boolean isValid() {
-        for (int i = 0; i < this.order * this.order; i++) {
-            if ((!isCellColumnValid(i) || (!isCellRowValid(i)))) {
-                return false;
+    private boolean isCellRegionValid(Cell cell) {
+        Cell[] cells = this.cellsRegionByCell(cell);
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = i + 1; j < cells.length; j++) {
+                if (cells[i].getValue() == cells[j].getValue()) {
+                    return false;
+                }
             }
         }
         return true;
+    }
+
+    public final boolean isValid() {
+        for (Cell[] cellRow : this.cells) {
+            for (Cell cell : cellRow) {
+                if (!isCellColumnValid(cell.getCellColumn()) || !isCellRowValid(cell.getCellRow())) {
+                    return false;
+                }
+            }
+        }
+        for (int i = 0; i < this.order * this.order; i += this.order) {
+            for (int j = 0; j < this.order * this.order; j += this.order) {
+                if (!isCellRegionValid(this.cells[i][j])){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public final Cell getFirstValidCell(){
+        for (int i = 0; i < this.order* this.order; i++) {
+            for (int j = 0; j < this.order * this.order; j++) {
+                if (!this.cells[i][j].isEmpty()){
+                    return this.cells[i][j];
+                }
+            }
+        }
+        return null;
     }
 
     public String prettyPrint() {
