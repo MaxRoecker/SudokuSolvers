@@ -37,6 +37,13 @@ public final class Sudoku {
         }
     }
 
+    /**
+     * @return array of numbers of elements in Sudoku, the index of array represents the element of Sudoku
+     */
+    public int[] getNumberOfElements() {
+        return numberOfElements;
+    }
+
     public boolean isValid(){
         for(Frame[] frames : this.frames)
             for(Frame frame : frames){
