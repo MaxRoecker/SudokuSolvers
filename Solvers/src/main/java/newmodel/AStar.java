@@ -51,6 +51,7 @@ public final class AStar {
                 int value = rowCells[i].getValue();
                 possibilities[value - 1] = Sudoku.Cell.EMPTY_VALUE;
             }
+            return null;
         }
 
 

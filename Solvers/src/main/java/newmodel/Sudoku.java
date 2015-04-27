@@ -26,35 +26,43 @@ public class Sudoku {
                 this.cells[i][j] = new Cell(i, j, elements[k++]);
             }
         }
+    }
 
-        /**
-         * TODO Verificar se pode adicionar a si mesmo.
-         * Set the region relation to each cell.
-         */
-        for (int i = 0; i < order * order; i++) {
-            for (int j = 0; j < order * order; j++) {
-                Cell cell = this.cells[i][j];
-                for (int l = (i / order); l < ((i / order) + order); l++) {
-                    for (int m = (j / order); m < ((j / order) + order); m++) {
-                        cell.getRegionRelations().add(this.cells[l][m]);
-                    }
+    public Cell[] getRowRelations(Cell cell) {
+        Cell[] result = new Cell[this.order * this.order - 1];
+        Cell[] cellsByRow = this.cellsByRow(cell.getCellRow());
+        for (int i = 0; i < cell.getCellRow(); i++) {
+            result[i] = cellsByRow[i];
+        }
+        for (int i = cell.getCellRow() + 1; i < this.order * this.order; i++) {
+            result[i - 1] = cellsByRow[i];
+        }
+        return result;
+    }
+
+    public Cell[] getColumnRelations(Cell cell) {
+        Cell[] result = new Cell[this.order * this.order - 1];
+        Cell[] cellsByColumn = this.cellsByColumn(cell.getCellColumn());
+        for (int i = 0; i < cell.getCellColumn(); i++) {
+            result[i] = cellsByColumn[i];
+        }
+        for (int i = cell.getCellColumn() + 1; i < this.order * this.order; i++) {
+            result[i-1] = cellsByColumn[i];
+        }
+        return result;
+    }
+
+    public Cell[] getRegionRelations(Cell cell){
+        Cell[] result = new Cell[this.order * this.order];
+        int indexResult = 0;
+        for (int l = (cell.getCellRow() / order) * order; l < (((cell.getCellRow() / order) * order) + order); l++) {
+            for (int m = (cell.getCellColumn() / order) * order; m < (((cell.getCellColumn() / order) * order) + order); m++) {
+                if (l != cell.getCellRow() && m != cell.getCellColumn()){
+                    result[indexResult++] = this.cells[l][m];
                 }
-
-
             }
         }
-
-        for (int i = 0; i < order * order; i++) {
-            for (int j = 0; j < order * order; j++) {
-                Cell cell = this.cells[i][j];
-
-                Cell[] rowRelations = this.cellsByRow(i);
-                Cell[] columnRelations = this.cellsByColumn(j);
-
-                cell.setRowRelations(Arrays.asList(rowRelations));
-                cell.setColumnRelations(Arrays.asList(columnRelations));
-            }
-        }
+        return result;
     }
 
 

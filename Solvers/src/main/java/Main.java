@@ -1,4 +1,4 @@
-import util.Util;
+import util.UtilOld;
 
 /**
  * <p>
@@ -9,6 +9,6 @@ public class Main {
 
     public static void main(String[] args) {
         String fileName = "teste.txt";
-        Util.readFromFile(fileName);
+        UtilOld.readFromFile(fileName);
     }
 }
