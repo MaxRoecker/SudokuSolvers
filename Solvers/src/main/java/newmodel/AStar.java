@@ -23,28 +23,23 @@ public final class AStar {
 
             for(Sudoku.Cell[] cells : sudoku.getCells()){
                 for(Sudoku.Cell cell : cells){
-                    Slot slot = new Slot()
                 }
             }
 
         }
 
-        public Sudoku.Cell cell() {
-            Sudoku.Cell choose = sudoku.getCells()[0][0];
 
-            for (Sudoku.Cell[] cells : sudoku.getCells()) {
-                for (Sudoku.Cell cell : cells) {
-
-                }
-
-            }
-        }
-
-
-        public int[] possibilities(Sudoku.Cell cell) {
+        public byte[] possibilities(Sudoku.Cell cell) {
             Sudoku.Cell[] rowCells = this.sudoku.cellsByRow(cell.getCellRow());
-            int[] allPossibilities = new int[this.sudoku.getOrder() * this.sudoku.getOrder()];
+            byte[] possibilities = new byte[this.sudoku.getOrder() * this.sudoku.getOrder() + 1];
+            possibilities[0] = 0;
+            for (int i = 0; i < possibilities.length; i++) {
+                possibilities[i] = 1;
+            }
 
+            for(Sudoku.Cell relation : sudoku.getRowRelations(cell)){
+                possibilities[relation.getValue()] = 0;
+            }
 
 
             for (int i = 0; i < this.sudoku.getOrder() * this.sudoku.getOrder(); i++) {
@@ -60,22 +55,18 @@ public final class AStar {
     public final static class Slot {
         private final int row;
         private final int column;
-        private final int[] possibilities;
+        private final byte[] possibilities;
 
         public Slot(Slot slot){
             this.row = slot.getRow();
             this.column = slot.getColumn();
-            this.possibilities = Arrays.copyOf(slot.getPossibilities(),slot.getPossibilities().length);
+            this.possibilities = Arrays.copyOf(slot.getPossibilities(), slot.getPossibilities().length);
         }
 
-        public Slot(Sudoku.Cell cell) {
-            this.row = cell.getCellRow();
-            this.column = cell.getCellColumn();
-            int order = cell.getSudoku().getOrder();
-            this.possibilities = new int[order*order];
-            for (int i = 0; i < order*order; i++) {
-
-            }
+        public Slot(int row, int column, byte[] possibilities) {
+            this.row = row;
+            this.column = column;
+            this.possibilities = possibilities;
         }
 
         public int getRow() {
@@ -86,7 +77,7 @@ public final class AStar {
             return column;
         }
 
-        public int[] getPossibilities() {
+        public byte[] getPossibilities() {
             return possibilities;
         }
 
@@ -99,18 +90,6 @@ public final class AStar {
             boolean result = (this.possibilities[possibility-1] != 0);
             this.possibilities[possibility-1] = 0;
             return result;
-        }
-
-        public int h(){
-            int zeros = count(this.possibilities,0);
-            return this.possibilities.length - zeros;
-        }
-
-        private int count(int[] ints, int value){
-            int counter = 0;
-            for(int i : ints)
-                if (i == value) counter++;
-            return counter;
         }
 
     }
