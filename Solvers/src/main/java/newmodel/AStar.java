@@ -34,6 +34,7 @@ public final class AStar {
                 }
 
             }
+            return null;
         }
 
         public int[] possibilities(Sudoku.Cell cell) {
@@ -44,7 +45,7 @@ public final class AStar {
                 int value = rowCells[i].getValue();
                 possibilities[value - 1] = Sudoku.Cell.EMPTY_VALUE;
             }
-
+            return null;
         }
 
         /**
@@ -75,7 +76,7 @@ public final class AStar {
         }
 
         public int h() {
-
+            return 0;
         }
     }
 

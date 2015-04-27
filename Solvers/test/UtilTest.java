@@ -7,7 +7,7 @@ public class UtilTest {
 
     /*@Test
     public void testReadFromFile(){
-        model.Frame[][] frames = util.Util.readFromFile("easy.txt");
+        model.Frame[][] frames = util.UtilOld.readFromFile("easy.txt");
         model.Sudoku sudoku = new model.Sudoku(frames);
         sudoku.prettyPrint();
 
