@@ -1,9 +1,8 @@
 package newmodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.*;
 
 /**
  * <p>
@@ -47,36 +46,55 @@ public final class AStar {
 
         }
 
-        /**
-         *
-         * @param numbers
-         * @return
-         */
-        private int countZeroValues(int[] numbers){
-            int count = 0;
-            for(int number : numbers)
-                if(number == 0)
-                    count++;
-            return count;
-        }
-
 
     }
 
     public final static class Slot {
-        private Sudoku.Cell[] possibilities;
+        private final int row;
+        private final int column;
+        private final int[] possibilities;
 
-        public Slot(Sudoku.Cell[] possibilities) {
+        public Slot(int row, int column, int[] possibilities) {
+            this.row = row;
+            this.column = column;
             this.possibilities = possibilities;
         }
 
-        public Sudoku.Cell[] getPossibilities() {
+        public int getRow() {
+            return row;
+        }
+
+        public int getColumn() {
+            return column;
+        }
+
+        public int[] getPossibilities() {
             return possibilities;
         }
 
-        public int h() {
-
+        /**
+         * Remove the possibility value of the slot.
+         * @param possibility
+         * @return {@code true} if the possibilities was changed, {@code false} otherwise.
+         */
+        public boolean removePossibility(int possibility){
+            boolean result = (this.possibilities[possibility-1] != 0);
+            this.possibilities[possibility-1] = 0;
+            return result;
         }
+
+        public int h(){
+            int zeros = count(this.possibilities,0);
+            return this.possibilities.length - zeros;
+        }
+
+        private int count(int[] ints, int value){
+            int counter = 0;
+            for(int i : ints)
+                if (i == value) counter++;
+            return counter;
+        }
+
     }
 
 }

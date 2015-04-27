@@ -3,10 +3,8 @@ package newmodel;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -41,6 +39,8 @@ public class Sudoku {
                         cell.getRegionRelations().add(this.cells[l][m]);
                     }
                 }
+
+
             }
         }
 
@@ -55,9 +55,8 @@ public class Sudoku {
                 cell.setColumnRelations(Arrays.asList(columnRelations));
             }
         }
-
-
     }
+
 
     public int getOrder() {
         return order;
@@ -127,10 +126,14 @@ public class Sudoku {
         private final int cellRow;
         private final int cellColumn;
         private final boolean fixed;
-        private Collection<Cell> rowRelations = new ArrayList<>();
-        private Collection<Cell> columnRelations = new ArrayList<>();
-        private Collection<Cell> regionRelations = new ArrayList<>();
         private int value;
+
+        public Cell(Cell cell){
+            this.cellRow = cell.getCellRow();
+            this.cellColumn = cell.getCellColumn();
+            this.value = cell.getValue();
+            this.fixed = cell.isFixed();
+        }
 
         public Cell(int cellRow, int cellColumn, int value) {
             this.cellRow = cellRow;
@@ -161,30 +164,6 @@ public class Sudoku {
 
         public final boolean isEmpty() {
             return this.value == EMPTY_VALUE;
-        }
-
-        public Collection<Cell> getRowRelations() {
-            return rowRelations;
-        }
-
-        public void setRowRelations(Collection<Cell> rowRelations) {
-            this.rowRelations = rowRelations;
-        }
-
-        public Collection<Cell> getColumnRelations() {
-            return columnRelations;
-        }
-
-        public void setColumnRelations(Collection<Cell> columnRelations) {
-            this.columnRelations = columnRelations;
-        }
-
-        public Collection<Cell> getRegionRelations() {
-            return regionRelations;
-        }
-
-        public void setRegionRelations(Collection<Cell> regionRelations) {
-            this.regionRelations = regionRelations;
         }
 
         @Override
