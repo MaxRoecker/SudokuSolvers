@@ -13,15 +13,20 @@ public final class AStar {
 
     public final static class Instance {
 
-        private final int[] allPossibilities;
         private final Sudoku sudoku;
-
+        private final Slot[][] slots;
 
         public Instance(Sudoku sudoku) {
+            int order = sudoku.getOrder();
             this.sudoku = sudoku;
-            this.allPossibilities = new int[sudoku.getOrder() * sudoku.getOrder()];
-            for (int i = 0; i < sudoku.getOrder() * sudoku.getOrder(); i++)
-                allPossibilities[i] = i + 1;
+            this.slots = new Slot[order*order][order*order];
+
+            for(Sudoku.Cell[] cells : sudoku.getCells()){
+                for(Sudoku.Cell cell : cells){
+                    Slot slot = new Slot()
+                }
+            }
+
         }
 
         public Sudoku.Cell cell() {
@@ -35,15 +40,17 @@ public final class AStar {
             }
         }
 
+
         public int[] possibilities(Sudoku.Cell cell) {
             Sudoku.Cell[] rowCells = this.sudoku.cellsByRow(cell.getCellRow());
-            int[] possibilities = Arrays.copyOf(this.allPossibilities, this.allPossibilities.length);
+            int[] allPossibilities = new int[this.sudoku.getOrder() * this.sudoku.getOrder()];
+
+
 
             for (int i = 0; i < this.sudoku.getOrder() * this.sudoku.getOrder(); i++) {
                 int value = rowCells[i].getValue();
                 possibilities[value - 1] = Sudoku.Cell.EMPTY_VALUE;
             }
-
         }
 
 
@@ -54,10 +61,20 @@ public final class AStar {
         private final int column;
         private final int[] possibilities;
 
-        public Slot(int row, int column, int[] possibilities) {
-            this.row = row;
-            this.column = column;
-            this.possibilities = possibilities;
+        public Slot(Slot slot){
+            this.row = slot.getRow();
+            this.column = slot.getColumn();
+            this.possibilities = Arrays.copyOf(slot.getPossibilities(),slot.getPossibilities().length);
+        }
+
+        public Slot(Sudoku.Cell cell) {
+            this.row = cell.getCellRow();
+            this.column = cell.getCellColumn();
+            int order = cell.getSudoku().getOrder();
+            this.possibilities = new int[order*order];
+            for (int i = 0; i < order*order; i++) {
+
+            }
         }
 
         public int getRow() {
