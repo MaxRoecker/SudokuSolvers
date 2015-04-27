@@ -14,59 +14,63 @@ public final class AStar {
     public final static class Instance {
 
         private final Sudoku sudoku;
-        private final Slot[][] slots;
+        private final PriorityQueue<Slot> slotPriorityQueue = new PriorityQueue<>();
 
         public Instance(Sudoku sudoku) {
             int order = sudoku.getOrder();
             this.sudoku = sudoku;
-            this.slots = new Slot[order*order][order*order];
 
-            for(Sudoku.Cell[] cells : sudoku.getCells()){
-                for(Sudoku.Cell cell : cells){
+            for (Sudoku.Cell[] cells : sudoku.getCells()) {
+                for (Sudoku.Cell cell : cells) {
+                    Slot slot = new Slot(cell.getCellRow(), cell.getCellColumn(), possibilities(cell), g(cell));
+                    this.slots[cell.getCellRow()][cell.getCellColumn()] = slot;
                 }
             }
 
         }
 
-
         public byte[] possibilities(Sudoku.Cell cell) {
-            Sudoku.Cell[] rowCells = this.sudoku.cellsByRow(cell.getCellRow());
             byte[] possibilities = new byte[this.sudoku.getOrder() * this.sudoku.getOrder() + 1];
             possibilities[0] = 0;
-            for (int i = 0; i < possibilities.length; i++) {
+            for (int i = 1; i < possibilities.length; i++) {
                 possibilities[i] = 1;
             }
 
-            for(Sudoku.Cell relation : sudoku.getRowRelations(cell)){
+            for (Sudoku.Cell relation : sudoku.getRowRelations(cell)) {
                 possibilities[relation.getValue()] = 0;
             }
-
-
-            for (int i = 0; i < this.sudoku.getOrder() * this.sudoku.getOrder(); i++) {
-                int value = rowCells[i].getValue();
-                possibilities[value - 1] = Sudoku.Cell.EMPTY_VALUE;
+            for (Sudoku.Cell relation : sudoku.getColumnRelations(cell)) {
+                possibilities[relation.getValue()] = 0;
             }
-            return null;
+            for (Sudoku.Cell relation : sudoku.getRegionRelations(cell)) {
+                possibilities[relation.getValue()] = 0;
+            }
+            return possibilities;
+        }
+
+        public int g(Sudoku.Cell cell) {
+            int counter = 0;
+            for (Sudoku.Cell relation : sudoku.getRowRelations(cell)) {
+                if (relation.isEmpty())
+                    counter++;
+            }
+            return counter;
         }
 
 
     }
 
-    public final static class Slot {
+    public final static class Slot implements Comparable<Slot>{
         private final int row;
         private final int column;
+        private final int g;
         private final byte[] possibilities;
 
-        public Slot(Slot slot){
-            this.row = slot.getRow();
-            this.column = slot.getColumn();
-            this.possibilities = Arrays.copyOf(slot.getPossibilities(), slot.getPossibilities().length);
-        }
-
-        public Slot(int row, int column, byte[] possibilities) {
+        public Slot(int row, int column, byte[] possibilities, int g) {
             this.row = row;
             this.column = column;
             this.possibilities = possibilities;
+            this.g = g;
         }
 
         public int getRow() {
@@ -81,17 +85,25 @@ public final class AStar {
             return possibilities;
         }
 
-        /**
-         * Remove the possibility value of the slot.
-         * @param possibility
-         * @return {@code true} if the possibilities was changed, {@code false} otherwise.
-         */
-        public boolean removePossibility(int possibility){
-            boolean result = (this.possibilities[possibility-1] != 0);
-            this.possibilities[possibility-1] = 0;
-            return result;
+        public int h() {
+            int counter = 0;
+            for (byte possibility : possibilities)
+                counter += possibility;
+            return counter;
         }
 
+        public int g() {
+            return this.g;
+        }
+
+        public int cost() {
+            return this.g() + this.h();
+        }
+
+        @Override
+        public int compareTo(Slot o) {
+            return this.cost() - o.cost();
+        }
     }
 
 }
