@@ -1,5 +1,6 @@
 package newmodel;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -28,6 +29,10 @@ public class Sudoku {
         }
     }
 
+    /**
+     * @param cell {@link newmodel.Sudoku.Cell} Cell to get row relations.
+     * @return Array of {@link Cell} related cells.
+     */
     public Cell[] getRowRelations(Cell cell) {
         Cell[] result = new Cell[this.order * this.order - 1];
         Cell[] cellsByRow = this.cellsByRow(cell.getCellRow());
@@ -40,6 +45,10 @@ public class Sudoku {
         return result;
     }
 
+    /**
+     * @param cell {@link newmodel.Sudoku.Cell} Cell to get column relations.
+     * @return Array of {@link Cell} related cells.
+     */
     public Cell[] getColumnRelations(Cell cell) {
         Cell[] result = new Cell[this.order * this.order - 1];
         Cell[] cellsByColumn = this.cellsByColumn(cell.getCellColumn());
@@ -47,22 +56,43 @@ public class Sudoku {
             result[i] = cellsByColumn[i];
         }
         for (int i = cell.getCellColumn() + 1; i < this.order * this.order; i++) {
-            result[i-1] = cellsByColumn[i];
+            result[i - 1] = cellsByColumn[i];
         }
         return result;
     }
 
-    public Cell[] getRegionRelations(Cell cell){
-        Cell[] result = new Cell[this.order * this.order];
+    /**
+     * @param cell {@link newmodel.Sudoku.Cell} Cell to get region relations.
+     * @return Array of {@link Cell} related cells.
+     */
+    public Cell[] getRegionRelations(Cell cell) {
+        Cell[] result = new Cell[this.order * this.order - 1];
         int indexResult = 0;
         for (int l = (cell.getCellRow() / order) * order; l < (((cell.getCellRow() / order) * order) + order); l++) {
             for (int m = (cell.getCellColumn() / order) * order; m < (((cell.getCellColumn() / order) * order) + order); m++) {
-                if (l != cell.getCellRow() && m != cell.getCellColumn()){
+                if (!(l == cell.getCellRow() && m == cell.getCellColumn())) {
                     result[indexResult++] = this.cells[l][m];
                 }
             }
         }
         return result;
+    }
+
+    public Cell[] getRelations(Cell cell) {
+        Cell[] result = this.getRowRelations(cell);
+        result = ArrayUtils.addAll(result, this.getColumnRelations(cell));
+        Cell[] subRegionRelations = new Cell[(this.order - 1) * (this.order - 1)];
+        int index = 0;
+        for (int l = (cell.getCellRow() / order) * order; l < (((cell.getCellRow() / order) * order) + order); l++) {
+            if (l != cell.getCellRow()) {
+                for (int m = (cell.getCellColumn() / order) * order; m < (((cell.getCellColumn() / order) * order) + order); m++) {
+                    if (m != cell.getCellColumn()){
+                        subRegionRelations[index++] = this.cells[l][m];
+                    }
+                }
+            }
+        }
+        return ArrayUtils.addAll(result,subRegionRelations);
     }
 
 
@@ -104,6 +134,7 @@ public class Sudoku {
 
     /**
      * TODO
+     *
      * @return
      */
     public final boolean isValid() {
@@ -135,7 +166,7 @@ public class Sudoku {
         private final boolean fixed;
         private int value;
 
-        public Cell(Cell cell){
+        public Cell(Cell cell) {
             this.cellRow = cell.getCellRow();
             this.cellColumn = cell.getCellColumn();
             this.value = cell.getValue();
