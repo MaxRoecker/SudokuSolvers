@@ -173,7 +173,7 @@ public class Sudoku {
         return true;
     }
 
-    public final Cell getFirstValidCell(){
+    public final Cell getFirstNotEmptyCell(){
         for (int i = 0; i < this.order* this.order; i++) {
             for (int j = 0; j < this.order * this.order; j++) {
                 if (!this.cells[i][j].isEmpty()){
@@ -183,6 +183,19 @@ public class Sudoku {
         }
         return null;
     }
+
+    public final Cell getFirstEmptyCell(){
+        for (int i = 0; i < this.order* this.order; i++) {
+            for (int j = 0; j < this.order * this.order; j++) {
+                if (this.cells[i][j].isEmpty()){
+                    return this.cells[i][j];
+                }
+            }
+        }
+        return null;
+    }
+
+
 
     public String prettyPrint() {
         StringBuilder stringBuilder = new StringBuilder();

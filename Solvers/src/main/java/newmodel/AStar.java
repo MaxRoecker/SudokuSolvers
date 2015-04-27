@@ -1,9 +1,5 @@
 package newmodel;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.*;
-
 /**
  * <p>
  * </p>
@@ -11,99 +7,68 @@ import java.util.*;
  */
 public final class AStar {
 
+
     public final static class Instance {
-
+        private final Instance parent;
         private final Sudoku sudoku;
-        private final PriorityQueue<Slot> slotPriorityQueue = new PriorityQueue<>();
+        private final Sudoku.Cell least;
+        private final int cost;
 
-        public Instance(Sudoku sudoku) {
-            int order = sudoku.getOrder();
+        public Instance(Instance parent, Sudoku sudoku) {
+            this.parent = parent;
             this.sudoku = sudoku;
-
+            Sudoku.Cell least = sudoku.getFirstEmptyCell();
+            int cost = (calcGofCell(sudoku, least) + calcHOfCell(sudoku, least));
             for (Sudoku.Cell[] cells : sudoku.getCells()) {
                 for (Sudoku.Cell cell : cells) {
-                    Slot slot = new Slot(cell.getCellRow(), cell.getCellColumn(), possibilities(cell), g(cell));
-                    this.slots[cell.getCellRow()][cell.getCellColumn()] = slot;
+                    if (cell.isEmpty()) {
+                        int h = calcHOfCell(sudoku, cell);
+                        int g = calcGofCell(sudoku, cell);
+                        if ((g + h) < cost) {
+                            cost = h + g;
+                            least = cell;
+                        }
+                    }
                 }
             }
-
+            this.cost = cost;
+            this.least = least;
         }
 
-        public byte[] possibilities(Sudoku.Cell cell) {
-            byte[] possibilities = new byte[this.sudoku.getOrder() * this.sudoku.getOrder() + 1];
+        public Instance(Sudoku sudoku) {
+            this(null, sudoku);
+        }
+
+        private static int calcHOfCell(Sudoku sudoku, Sudoku.Cell cell) {
+            byte[] possibleValues = Instance.getPossibleValuesOfCell(sudoku, cell);
+            int counter = 0;
+            for (byte possibleValue : possibleValues) {
+                counter += possibleValue;
+            }
+            return counter;
+        }
+
+        private static byte[] getPossibleValuesOfCell(Sudoku sudoku, Sudoku.Cell cell) {
+            byte[] possibilities = new byte[sudoku.getOrder() * sudoku.getOrder() + 1];
             possibilities[0] = 0;
             for (int i = 1; i < possibilities.length; i++) {
                 possibilities[i] = 1;
             }
-
-            for (Sudoku.Cell relation : sudoku.getRowRelations(cell)) {
-                possibilities[relation.getValue()] = 0;
-            }
-            for (Sudoku.Cell relation : sudoku.getColumnRelations(cell)) {
-                possibilities[relation.getValue()] = 0;
-            }
-            for (Sudoku.Cell relation : sudoku.getRegionRelations(cell)) {
+            for (Sudoku.Cell relation : sudoku.getRelations(cell)) {
                 possibilities[relation.getValue()] = 0;
             }
             return possibilities;
         }
 
-        public int g(Sudoku.Cell cell) {
+        private static int calcGofCell(Sudoku sudoku, Sudoku.Cell cell) {
             int counter = 0;
-            for (Sudoku.Cell relation : sudoku.getRowRelations(cell)) {
+            for (Sudoku.Cell relation : sudoku.getRelations(cell)) {
                 if (relation.isEmpty())
                     counter++;
             }
             return counter;
         }
 
-
-    }
-
-    public final static class Slot implements Comparable<Slot>{
-        private final int row;
-        private final int column;
-        private final int g;
-        private final byte[] possibilities;
-
-        public Slot(int row, int column, byte[] possibilities, int g) {
-            this.row = row;
-            this.column = column;
-            this.possibilities = possibilities;
-            this.g = g;
-        }
-
-        public int getRow() {
-            return row;
-        }
-
-        public int getColumn() {
-            return column;
-        }
-
-        public byte[] getPossibilities() {
-            return possibilities;
-        }
-
-        public int h() {
-            int counter = 0;
-            for (byte possibility : possibilities)
-                counter += possibility;
-            return counter;
-        }
-
-        public int g() {
-            return this.g;
-        }
-
-        public int cost() {
-            return this.g() + this.h();
-        }
-
-        @Override
-        public int compareTo(Slot o) {
-            return this.cost() - o.cost();
-        }
     }
 
 }
