@@ -122,20 +122,22 @@ public class Sudoku {
 
     public static final class Cell {
         public static final int EMPTY_VALUE = 0;
-
+        private final Sudoku sudoku;
         private final int cellRow;
         private final int cellColumn;
         private final boolean fixed;
         private int value;
 
         public Cell(Cell cell){
+            this.sudoku = cell.getSudoku();
             this.cellRow = cell.getCellRow();
             this.cellColumn = cell.getCellColumn();
             this.value = cell.getValue();
             this.fixed = cell.isFixed();
         }
 
-        public Cell(int cellRow, int cellColumn, int value) {
+        public Cell(Sudoku sudoku, int cellRow, int cellColumn, int value) {
+            this.sudoku = sudoku;
             this.cellRow = cellRow;
             this.cellColumn = cellColumn;
             this.value = value;
@@ -150,9 +152,14 @@ public class Sudoku {
             return cellColumn;
         }
 
+        public Sudoku getSudoku() {
+            return sudoku;
+        }
+
         public final int getValue() {
             return value;
         }
+
 
         public final void setValue(int value) {
             this.value = value;
@@ -194,7 +201,5 @@ public class Sudoku {
         public final String toString() {
             return String.valueOf(value);
         }
-
-
     }
 }
