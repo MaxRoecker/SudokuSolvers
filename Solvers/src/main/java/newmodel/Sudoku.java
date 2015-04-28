@@ -44,10 +44,10 @@ public class Sudoku {
     public Cell[] getRowRelations(Cell cell) {
         Cell[] result = new Cell[this.order * this.order - 1];
         Cell[] cellsByRow = this.cellsByRow(cell.getCellRow());
-        for (int i = 0; i < cell.getCellRow(); i++) {
+        for (int i = 0; i < cell.getCellColumn(); i++) {
             result[i] = cellsByRow[i];
         }
-        for (int i = cell.getCellRow() + 1; i < this.order * this.order; i++) {
+        for (int i = cell.getCellColumn() + 1; i < this.order * this.order; i++) {
             result[i - 1] = cellsByRow[i];
         }
         return result;
@@ -60,10 +60,10 @@ public class Sudoku {
     public Cell[] getColumnRelations(Cell cell) {
         Cell[] result = new Cell[this.order * this.order - 1];
         Cell[] cellsByColumn = this.cellsByColumn(cell.getCellColumn());
-        for (int i = 0; i < cell.getCellColumn(); i++) {
+        for (int i = 0; i < cell.getCellRow(); i++) {
             result[i] = cellsByColumn[i];
         }
-        for (int i = cell.getCellColumn() + 1; i < this.order * this.order; i++) {
+        for (int i = cell.getCellRow() + 1; i < this.order * this.order; i++) {
             result[i - 1] = cellsByColumn[i];
         }
         return result;
@@ -204,6 +204,27 @@ public class Sudoku {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sudoku sudoku = (Sudoku) o;
+
+        return new EqualsBuilder()
+                .append(getOrder(), sudoku.getOrder())
+                .append(getCells(), sudoku.getCells())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getOrder())
+                .append(getCells())
+                .toHashCode();
+    }
 
     public String prettyPrint() {
         StringBuilder stringBuilder = new StringBuilder();

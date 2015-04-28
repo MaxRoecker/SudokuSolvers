@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 public class SudokuTest {
 
     int[] validValues = {
-            1, 2, 3, 4, 5, 6, 7, 8, 1,
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
             7, 8, 9, 1, 2, 3, 4, 5, 6,
             4, 5, 6, 7, 8, 9, 1, 2, 3,
 
@@ -75,7 +75,7 @@ public class SudokuTest {
         Sudoku.Cell cell = new Sudoku.Cell(0,0,1);
         Sudoku.Cell[] rowRelations = sudoku.getRowRelations(cell);
         for (int i = 1; i < 9; i++) {
-            assertEquals(validValues[i],rowRelations[i-1].getValue());
+            assertEquals(validValues[i], rowRelations[i - 1].getValue());
         }
     }
 
@@ -102,5 +102,14 @@ public class SudokuTest {
         assertEquals(validValues[18],regionRelations[5].getValue());
         assertEquals(validValues[19],regionRelations[6].getValue());
         assertEquals(validValues[20], regionRelations[7].getValue());
+    }
+
+    @Test
+    public void testCopyConstructor() throws Exception{
+        Sudoku sudoku = new Sudoku(3,validValues);
+        Sudoku copy = new Sudoku(sudoku);
+         //System.out.println(copy.prettyPrint());
+
+
     }
 }
