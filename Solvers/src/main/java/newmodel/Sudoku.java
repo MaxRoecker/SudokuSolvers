@@ -4,9 +4,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * <p>
  * </p>
@@ -16,6 +13,17 @@ public class Sudoku {
 
     private final int order;
     private final Cell[][] cells;
+
+    public Sudoku(Sudoku sudoku){
+        this.order = sudoku.getOrder();
+        this.cells = new Cell[order * order][order * order];
+
+        for (int i = 0; i < order * order; i++) {
+            for (int j = 0; j < order * order; j++) {
+                this.cells[i][j] = new Cell(sudoku.getCells()[i][j]);
+            }
+        }
+    }
 
     public Sudoku(int order, int[] elements) {
         this.order = order;
