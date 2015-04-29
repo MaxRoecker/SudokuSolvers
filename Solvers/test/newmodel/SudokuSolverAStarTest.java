@@ -14,9 +14,10 @@ import static org.junit.Assert.*;
  */
 public class SudokuSolverAStarTest {
 
+    /*
     @Test
     public void testSolve() throws Exception {
-        Sudoku sudoku = new Sudoku(3, Util.readFromFile("test.txt"));
+        Sudoku sudoku = new Sudoku(3, Util.readFromFile("hard.txt"));
         SudokuSolverAStar solverAStar = new SudokuSolverAStar(sudoku);
         Sudoku solved = solverAStar.solve();
         if(solved != null){
@@ -25,4 +26,5 @@ public class SudokuSolverAStarTest {
             System.out.println("Not possible to solve.");
         }
     }
+    */
 }
