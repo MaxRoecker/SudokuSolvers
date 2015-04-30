@@ -1,7 +1,5 @@
 package newmodel;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -11,21 +9,22 @@ import java.util.*;
  */
 public final class SudokuSolverGenetic {
 
-    private Person[] population;
-    private Sudoku sudoku;
+    private Item[] population;
 
-    public SudokuSolverGenetic(Sudoku sudoku) {
-        List<Integer> possibleNumbers = new ArrayList<>();
+    public SudokuSolverGenetic(Sudoku sudoku, int sizePopulation) {
+        this.population = new Item[sizePopulation];
+
+        List<Integer> elementsPossibles = new ArrayList<>();
         for (int i = 0; i < sudoku.getOrder() * sudoku.getOrder(); i++) {
-            for (int j = 1; j <= sudoku.getOrder() * sudoku.getOrder(); j++) {
-                possibleNumbers.add(j);
+            for (int j = 0; j < sudoku.getOrder() * sudoku.getOrder(); j++) {
+                elementsPossibles.add((j + 1));
             }
         }
 
         for (Sudoku.Cell[] cells : sudoku.getCells()) {
             for (Sudoku.Cell cell : cells) {
                 if (!cell.isEmpty()) {
-                    possibleNumbers.remove(possibleNumbers.indexOf(cell.getValue()));
+                    elementsPossibles.remove(elementsPossibles.indexOf(cell.getValue()));
                 }
             }
         }
@@ -33,238 +32,234 @@ public final class SudokuSolverGenetic {
         for (Sudoku.Cell[] cells : sudoku.getCells()) {
             for (Sudoku.Cell cell : cells) {
                 if (cell.isEmpty()) {
-                    Collections.shuffle(possibleNumbers);
-                    cell.setValue(possibleNumbers.remove(0));
+                    cell.setValue(elementsPossibles.remove(0));
                 }
             }
         }
 
-        this.sudoku = new Sudoku(sudoku);
-        this.population = new Person[this.sudoku.getOrder() * this.sudoku.getOrder()];
-        for (int i = 0; i < this.sudoku.getOrder() * this.sudoku.getOrder(); i++) {
-            this.population[i] = new Person(this.sudoku.cellsByRow(i));
+        population[0] = new Item(new Sudoku(sudoku));
+        for (int i = 1; i < sizePopulation; i++) {
+            population[i] = new Item(new Sudoku(shuffleSudoku(sudoku)));
         }
     }
 
-    public Sudoku getSudoku() {
-        return sudoku;
-    }
-
-    public void setSudoku(Sudoku sudoku) {
-        this.sudoku = sudoku;
-    }
-
-    public Person[] getPopulation() {
-        return population;
-    }
-
-    public void setPopulation(Person[] population) {
-        this.population = population;
-    }
-
-    public void calculePopulationRanking(double sumOfObjectives) {
-        for (Person person : population) {
-            person.setRanking((double) person.objective() / sumOfObjectives);
+    public Item fnFitness() {
+        Item best = this.population[0];
+        for (Item item : this.population) {
+            if (best.objective() > item.objective()) {
+                best = item;
+            }
         }
+        return best;
     }
 
-    public static final List<Person> crossOver(Person parent1, Person parent2) {
-        int positionOfCut = parent1.getFirstPositionOfDuplicate();
-        if (positionOfCut <= 0) {
-            positionOfCut = new Random().nextInt(9) + 1;
+    public List<Item> crossOver(Item parent1, Item parent2) {
+        Random random = new Random();
+        int cut = random.nextInt();
+        Item children1 = new Item(parent1.sudoku);
+        Item children2 = new Item(parent2.sudoku);
+        for (int i = 0; i < cut; i++) {
+            for (int j = 0; j < parent1.getSudoku().getOrder() * parent1.getSudoku().getOrder(); j++) {
+                children1.getSudoku().getCells()[i][j].setValue(parent1.getSudoku().getCells()[i][j].getValue());
+                children2.getSudoku().getCells()[i][j].setValue(parent2.getSudoku().getCells()[i][j].getValue());
+            }
         }
-        Sudoku.Cell[] cellsChildren1 = new Sudoku.Cell[parent1.getCells().length];
-        Sudoku.Cell[] cellsChildren2 = new Sudoku.Cell[parent2.getCells().length];
-
-        for (int i = 0; i < positionOfCut; i++) {
-            cellsChildren1[i] = parent1.getCells()[i];
-            cellsChildren2[i] = parent2.getCells()[i];
+        for (int i = cut; i < parent1.getSudoku().getOrder() * parent1.getSudoku().getOrder(); i++) {
+            for (int j = 0; j < parent1.getSudoku().getOrder() * parent1.getSudoku().getOrder(); j++) {
+                children1.getSudoku().getCells()[i][j].setValue(parent2.getSudoku().getCells()[i][j].getValue());
+                children2.getSudoku().getCells()[i][j].setValue(parent1.getSudoku().getCells()[i][j].getValue());
+            }
         }
-        for (int i = positionOfCut; i < cellsChildren1.length; i++) {
-            cellsChildren1[i] = parent2.getCells()[i];
-            cellsChildren2[i] = parent1.getCells()[i];
-        }
-
-        List<Person> childrens = new ArrayList<>();
-        childrens.add(new Person(cellsChildren1));
-        childrens.add(new Person(cellsChildren2));
-
+        List<Item> childrens = new ArrayList<>();
+        childrens.add(children1);
+        childrens.add(children2);
         return childrens;
     }
 
-    public final Sudoku solve(Conditions conditions) {
-        int cycles = 0;
-        int cyclesWithoutConvergence = 0;
-        Instant start = Instant.now();
-        Instant now = Instant.now();
-        long minutes = Duration.between(start, now).toMinutes();
+    public Item reproduce(Item parent1, Item parent2) {
+        List<Item> childrens = crossOver(parent1, parent2);
+        Item best = childrens.get(0);
+        for (Item children : childrens) {
+            if (best.objective() > children.objective()) {
+                best = children;
+            }
+        }
+        return best;
+    }
+
+    public Item roulette() {
+        //TODO VERIFICAR SOMA DOS RANKINGS
+        int sumOfObjectives = 0;
+        for (Item item : this.population) {
+            sumOfObjectives += item.objective();
+        }
+        for (Item item : this.population) {
+            item.setRanking(((double) item.objective()) / ((double) sumOfObjectives));
+        }
+
+        double sumOfRanking = 0;
+        Score[] scores = new Score[this.population.length];
+        for (int i = 0; i < this.population.length; i++) {
+            scores[i] = new Score(sumOfRanking, sumOfRanking + this.population[i].getRanking(), this.population[i]);
+            sumOfRanking += this.population[i].getRanking();
+        }
 
         Random r = new Random();
-
-        while (conditions.check(cycles, cyclesWithoutConvergence, minutes)) {
-            double sumOfObjectives = 0;
-            for (Person person : this.population) {
-                sumOfObjectives += person.objective();
+        double raffled = r.nextDouble();
+        for (Score score : scores) {
+            if (score.between(raffled)) {
+                return score.item;
             }
-
-            calculePopulationRanking(sumOfObjectives);
-
-            Score[] scores = new Score[this.population.length];
-            double sumRankings = 0;
-            for (int i = 0; i < this.population.length; i++) {
-                scores[i] = new Score(sumRankings, (sumRankings + this.population[i].getRanking()),this.population[i]);
-                sumRankings += this.population[i].getRanking();
-            }
-
-            double random1 = r.nextDouble();
-            double random2 = r.nextDouble();
-            Person parent1 = null;
-            Person parent2 = null;
-
-            while (parent1 == null || parent2 == null) {
-                for (Score score : scores) {
-                    if (score.between(random1)) {
-                        parent1 = score.getPerson();
-                        break;
-                    }
-                }
-
-                for (Score score : scores) {
-                    if (score.between(random2)) {
-                        parent2 = score.getPerson();
-                        break;
-                    }
-                }
-
-                /*
-                //TODO VERIFICAR COM O MAX
-                if (parent1.equals(parent2)) {
-                    parent1 = null;
-                }
-                */
-            }
-
-            List<Person> childrens = crossOver(parent1, parent2);
-
-            Person bestChildren = childrens.get(0);
-            for (Person children : childrens) {
-                if (children.objective() < bestChildren.objective()){
-                    bestChildren = children;
-                }
-            }
-
-            if (updatePopulation(bestChildren)){
-                cyclesWithoutConvergence = 0;
-            }
-            cycles++;
-            cyclesWithoutConvergence++;
-            now = Instant.now();
-            minutes = Duration.between(start, now).toMinutes();
-
-            /**
-             * DEBUG
-             *
-             */
-            System.out.println(mountSodoku(sudoku.getOrder()).prettyPrint());
-            System.out.println();
-            System.out.println();
+            System.out.println(score.start + " - " + score.end);
         }
-
-        Sudoku solution = mountSodoku(sudoku.getOrder());
-        System.out.println(cycles);
-        System.out.println(cyclesWithoutConvergence);
-        System.out.println(minutes);
-        return solution;
+        System.out.println("");
+        System.out.println("");
+        System.out.println("");
+        return null;
     }
 
-    private Sudoku mountSodoku(int order) {
-        int[] elements = new int[order*order*order*order];
-        int index = 0;
-        for (int i = 0; i < this.population.length; i++) {
-            for (int j = 0; j < this.population[i].cells.length; j++) {
-                elements[index++] = this.population[i].cells[j].getValue();
-            }
-        }
-        return new Sudoku(order,elements);
+    public Item mutation(Item item) {
+        return new Item(new Sudoku(shuffleSudoku(item.getSudoku())));
     }
 
-    private boolean updatePopulation(Person children) {
-        Person worst = this.population[0];
+    public boolean updatePopulation(Item item) {
         int posWorst = 0;
         for (int i = 1; i < this.population.length; i++) {
-            if (worst.objective() < this.population[i].objective()){
-                worst = this.population[i];
+            if (this.population[i].objective() > this.population[posWorst].objective()) {
                 posWorst = i;
             }
         }
+        if (this.population[posWorst].objective() > item.objective()) {
+            return false;
+        }
+        this.population[posWorst] = new Item(item.sudoku);
+        return true;
+    }
 
-        this.population[posWorst] = new Person(children.cells);
-        return false;
+    public Sudoku solve(Conditions conditions) {
+        int cycles = 0;
+        int cyclesWithoutConvergence = 0;
+        Instant start = Instant.now();
+        Instant now;
+        long seconds;
+        Random random = new Random();
+        while (true) {
+            Item parent1 = roulette();
+            Item parent2 = roulette();
+
+            while (parent1.equals(parent2)) {
+                parent1 = roulette();
+                parent2 = roulette();
+            }
+
+            Item children = reproduce(parent1, parent2);
+
+            if (random.nextInt(100) < 1) {
+                children = mutation(children);
+            }
+
+            if (updatePopulation(children)){
+                cyclesWithoutConvergence = 0;
+            } else {
+                cyclesWithoutConvergence++;
+            }
+            cycles++;
+            now = Instant.now();
+            seconds = Duration.between(start, now).getSeconds();
+
+            if (conditions.checkConditios(cycles, cyclesWithoutConvergence, seconds)) {
+                break;
+            }
+        }
+        return fnFitness().getSudoku();
+    }
+
+    private Sudoku shuffleSudoku(Sudoku sudoku) {
+        Random r = new Random();
+        int numberOfChanges = r.nextInt(500) + 1;
+        for (int j = 0; j < numberOfChanges; j++) {
+            Sudoku.Cell cell1 = getRandomCell(sudoku);
+            Sudoku.Cell cell2 = getRandomCell(sudoku);
+            int aux = cell1.getValue();
+            cell1.setValue(cell2.getValue());
+            cell2.setValue(aux);
+        }
+        return sudoku;
+    }
+
+    private Sudoku.Cell getRandomCell(Sudoku sudoku) {
+        Random r = new Random();
+        int row = r.nextInt(sudoku.getOrder() * sudoku.getOrder());
+        int col = r.nextInt(sudoku.getOrder() * sudoku.getOrder());
+        while (sudoku.getCells()[row][col].isFixed()) {
+            row = r.nextInt(sudoku.getOrder() * sudoku.getOrder());
+            col = r.nextInt(sudoku.getOrder() * sudoku.getOrder());
+        }
+
+        return sudoku.getCells()[row][col];
     }
 
     private static final class Score {
-        private final double start;
-        private final double end;
-        private final Person person;
+        final double start;
+        final double end;
+        final Item item;
 
-        public Score(double start, double end, Person person) {
+        public Score(double start, double end, Item item) {
             this.start = start;
             this.end = end;
-            this.person = person;
+            this.item = item;
         }
 
-        public final boolean between(double value) {
-            return this.start <= value && value < this.end;
-        }
-
-        public Person getPerson() {
-            return person;
-        }
-
-        public double getEnd() {
-            return end;
-        }
-
-        public double getStart() {
-            return start;
+        public boolean between(double value) {
+            return start <= value &&
+                    value < end;
         }
     }
 
     public static final class Conditions {
         private final int cycles;
         private final int cyclesWithoutConvergence;
-        private final long time;
+        private final long seconds;
 
-        public Conditions(long time, int cyclesWithoutConvergence, int cycles) {
-            this.time = time;
-            this.cyclesWithoutConvergence = cyclesWithoutConvergence;
+        public Conditions(int cycles, int cyclesWithoutConvergence, long seconds) {
             this.cycles = cycles;
+            this.cyclesWithoutConvergence = cyclesWithoutConvergence;
+            this.seconds = seconds;
         }
 
-        public boolean check(int cycles, int cyclesWithoutConvergence, long minutes) {
-            return
-                    minutes <= time;
+        public final boolean checkConditios(int cycles, int cyclesWithoutConvergence, long seconds) {
+            return cycles <= this.cycles &&
+                    cyclesWithoutConvergence <= this.cyclesWithoutConvergence &&
+                    seconds <= this.seconds;
         }
+
     }
 
-    public static final class Person {
-        private final Sudoku.Cell[] cells;
+    public static class Item {
+        private final Sudoku sudoku;
         private double ranking;
 
-        public Person(Sudoku.Cell[] cells) {
-            this.cells = cells;
-            this.ranking = 0;
+        public Item(Sudoku sudoku) {
+            this.sudoku = sudoku;
         }
 
-        public final int getFirstPositionOfDuplicate() {
-            for (int i = 0; i < this.cells.length; i++) {
-                for (int j = i; j < this.cells.length; j++) {
-                    if (this.cells[i].getValue() == this.cells[j].getValue()) {
-                        return j;
+        public final int objective() {
+            int result = 0;
+            for (Sudoku.Cell[] cells : sudoku.getCells()) {
+                for (Sudoku.Cell cell : cells) {
+                    for (Sudoku.Cell relation : sudoku.getRelations(cell)) {
+                        if (relation.getValue() == cell.getValue()) {
+                            result++;
+                        }
                     }
                 }
             }
-            return -1;
+
+            return result;
+        }
+
+        public Sudoku getSudoku() {
+            return sudoku;
         }
 
         public double getRanking() {
@@ -275,51 +270,16 @@ public final class SudokuSolverGenetic {
             this.ranking = ranking;
         }
 
-        public Sudoku.Cell[] getCells() {
-            return cells;
-        }
-
-        public int objective() {
-            int[] values = new int[cells.length];
-
-            for (int i = 0; i < values.length; i++) {
-                boolean haveEquals = false;
-                for (int j = i - 1; j >= 0; j--) {
-                    if (values[j] == cells[i].getValue()) {
-                        haveEquals = true;
-                        break;
-                    }
-                }
-                if (!haveEquals) {
-                    values[i] = cells[i].getValue();
-                } else {
-                    values[i] = 0;
-                }
-            }
-
-            int countZeros = 0;
-            for (int i = 0; i < values.length; i++) {
-                if (values[i] == 0) {
-                    countZeros++;
-                }
-            }
-
-            return countZeros;
-        }
-
         @Override
-        public String toString() {
-            return "Person{" +
-                    "cells=" + Arrays.toString(cells) +
-                    '}';
-        }
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
 
-        public int[] getElements() {
-            int[] elements = new int[this.cells.length];
-            for (int i = 0; i < this.cells.length; i++) {
-                elements[i] = cells[i].getValue();
-            }
-            return elements;
+            Item item = (Item) o;
+
+            if (Double.compare(item.ranking, ranking) != 0) return false;
+            return !(sudoku != null ? !sudoku.equals(item.sudoku) : item.sudoku != null);
+
         }
     }
 }
