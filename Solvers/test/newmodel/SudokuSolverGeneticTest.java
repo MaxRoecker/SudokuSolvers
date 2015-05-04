@@ -28,9 +28,9 @@ public class SudokuSolverGeneticTest {
     @Test
     public void testSolve() throws Exception {
         Sudoku sudoku = new Sudoku(3, Util.readFromFile("easy.txt"));
-        SudokuSolverGenetic.Conditions conditions = new SudokuSolverGenetic.Conditions(5000,1000,900);
+        SudokuSolverGenetic.Conditions conditions = new SudokuSolverGenetic.Conditions(60000,1000,120);
 
-        SudokuSolverGenetic genetic = new SudokuSolverGenetic(sudoku,20);
+        SudokuSolverGenetic genetic = new SudokuSolverGenetic(sudoku,10);
         Sudoku solve = genetic.solve(conditions);
         System.out.println();
         System.out.println(solve.prettyPrint());

@@ -10,9 +10,11 @@ import java.util.*;
 public final class SudokuSolverGenetic {
 
     private Item[] population;
+    private static int id;
 
     public SudokuSolverGenetic(Sudoku sudoku, int sizePopulation) {
         this.population = new Item[sizePopulation];
+        id = sizePopulation+1;
 
         List<Integer> elementsPossibles = new ArrayList<>();
         for (int i = 0; i < sudoku.getOrder() * sudoku.getOrder(); i++) {
@@ -37,10 +39,13 @@ public final class SudokuSolverGenetic {
             }
         }
 
-        population[0] = new Item(new Sudoku(sudoku));
+
+        population[0] = new Item(sudoku,0);
+        System.out.println(population[0].objective());
         for (int i = 1; i < sizePopulation; i++) {
-            population[i] = new Item(new Sudoku(shuffleSudoku(sudoku)));
+            population[i] = new Item(new Sudoku(shuffleSudoku(sudoku)),i);
         }
+
     }
 
     public Item fnFitness() {
@@ -55,9 +60,9 @@ public final class SudokuSolverGenetic {
 
     public List<Item> crossOver(Item parent1, Item parent2) {
         Random random = new Random();
-        int cut = random.nextInt();
-        Item children1 = new Item(parent1.sudoku);
-        Item children2 = new Item(parent2.sudoku);
+        int cut = random.nextInt(parent1.getSudoku().getOrder() * parent1.getSudoku().getOrder());
+        Item children1 = new Item(parent1.sudoku,id++);
+        Item children2 = new Item(parent2.sudoku,id++);
         for (int i = 0; i < cut; i++) {
             for (int j = 0; j < parent1.getSudoku().getOrder() * parent1.getSudoku().getOrder(); j++) {
                 children1.getSudoku().getCells()[i][j].setValue(parent1.getSudoku().getCells()[i][j].getValue());
@@ -88,7 +93,6 @@ public final class SudokuSolverGenetic {
     }
 
     public Item roulette() {
-        //TODO VERIFICAR SOMA DOS RANKINGS
         int sumOfObjectives = 0;
         for (Item item : this.population) {
             sumOfObjectives += item.objective();
@@ -110,16 +114,12 @@ public final class SudokuSolverGenetic {
             if (score.between(raffled)) {
                 return score.item;
             }
-            System.out.println(score.start + " - " + score.end);
         }
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
         return null;
     }
 
     public Item mutation(Item item) {
-        return new Item(new Sudoku(shuffleSudoku(item.getSudoku())));
+        return new Item(new Sudoku(shuffleSudoku(item.getSudoku())),item.id);
     }
 
     public boolean updatePopulation(Item item) {
@@ -129,10 +129,10 @@ public final class SudokuSolverGenetic {
                 posWorst = i;
             }
         }
-        if (this.population[posWorst].objective() > item.objective()) {
+        if (this.population[posWorst].objective() < item.objective()) {
             return false;
         }
-        this.population[posWorst] = new Item(item.sudoku);
+        this.population[posWorst] = new Item(item.sudoku,item.id);
         return true;
     }
 
@@ -158,6 +158,8 @@ public final class SudokuSolverGenetic {
                 children = mutation(children);
             }
 
+            children = changeInvalidElements(children);
+
             if (updatePopulation(children)){
                 cyclesWithoutConvergence = 0;
             } else {
@@ -171,7 +173,60 @@ public final class SudokuSolverGenetic {
                 break;
             }
         }
-        return fnFitness().getSudoku();
+        printPopulation();
+
+        System.out.println("Cycles: " + cycles);
+        System.out.println("Cycles Without: "+cyclesWithoutConvergence);
+        System.out.println("Seconds: "+seconds);
+        Item i = fnFitness();
+        System.out.println(i.objective());
+        return i.getSudoku();
+    }
+
+    private Item changeInvalidElements(Item item) {
+        int[] elements = new int[item.getSudoku().getOrder()*item.getSudoku().getOrder()];
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = 0;
+        }
+        for (Sudoku.Cell[] cells : item.getSudoku().getCells()) {
+            for (Sudoku.Cell cell : cells) {
+                elements[cell.getValue()-1]++;
+            }
+        }
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i] > elements.length){
+                for (int j = 0; j < elements.length; j++) {
+                    if (elements[j] < elements.length){
+                        elements[j]--;
+                        elements[i]++;
+                        System.out.println("Trocando o valor "+(i+1)+" por "+(j+1));
+                        item = changeOnSudoku(item,i+1,j+1);
+                    }
+                }
+            }
+        }
+        return item;
+    }
+
+    private Item changeOnSudoku(Item item, int valueOld, int valueNew) {
+        for (Sudoku.Cell[] cells : item.getSudoku().getCells()) {
+            for (Sudoku.Cell cell : cells) {
+                if (cell.getValue() == valueOld){
+                    cell.setValue(valueNew);
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void printPopulation() {
+        for (Item item : population) {
+            System.out.println(item.objective() + " - "+item.id);
+            System.out.println(item.getSudoku().prettyPrint());
+            System.out.println();
+            System.out.println();
+        }
     }
 
     private Sudoku shuffleSudoku(Sudoku sudoku) {
@@ -228,19 +283,21 @@ public final class SudokuSolverGenetic {
         }
 
         public final boolean checkConditios(int cycles, int cyclesWithoutConvergence, long seconds) {
-            return cycles <= this.cycles &&
-                    cyclesWithoutConvergence <= this.cyclesWithoutConvergence &&
-                    seconds <= this.seconds;
+            return cycles > this.cycles ||
+                    cyclesWithoutConvergence > this.cyclesWithoutConvergence ||
+                    seconds > this.seconds;
         }
 
     }
 
     public static class Item {
+        private final int id;
         private final Sudoku sudoku;
         private double ranking;
 
-        public Item(Sudoku sudoku) {
+        public Item(Sudoku sudoku, int id) {
             this.sudoku = sudoku;
+            this.id = id;
         }
 
         public final int objective() {
@@ -272,13 +329,10 @@ public final class SudokuSolverGenetic {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
 
             Item item = (Item) o;
 
-            if (Double.compare(item.ranking, ranking) != 0) return false;
-            return !(sudoku != null ? !sudoku.equals(item.sudoku) : item.sudoku != null);
+            return item.id == this.id;
 
         }
     }
