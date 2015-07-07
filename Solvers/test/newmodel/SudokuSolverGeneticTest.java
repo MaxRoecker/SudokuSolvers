@@ -10,6 +10,7 @@ import static org.junit.Assert.*;
  */
 public class SudokuSolverGeneticTest {
 
+    /*
     @Test
     public void testConstrutor(){
         Sudoku sudoku = new Sudoku(3, Util.readFromFile("easy.txt"));
@@ -35,5 +36,5 @@ public class SudokuSolverGeneticTest {
         System.out.println();
         System.out.println(solve.prettyPrint());
     }
-
+ */
 }

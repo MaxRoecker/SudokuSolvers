@@ -15,16 +15,20 @@ import static org.junit.Assert.*;
 public class SudokuSolverAStarTest {
 
     /*
+
     @Test
     public void testSolve() throws Exception {
-        Sudoku sudoku = new Sudoku(3, Util.readFromFile("hard.txt"));
+        Sudoku sudoku = new Sudoku(5, Util.readFromFile("f3.txt"));
+        long time = System.currentTimeMillis();
         SudokuSolverAStar solverAStar = new SudokuSolverAStar(sudoku);
         Sudoku solved = solverAStar.solve();
         if(solved != null){
+            System.out.println("ASTAR - "+ ((System.currentTimeMillis() - time)) );
             System.out.println(solved.prettyPrint());
         }else{
             System.out.println("Not possible to solve.");
         }
     }
-    */
+
+*/
 }

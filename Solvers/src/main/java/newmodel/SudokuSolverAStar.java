@@ -27,16 +27,6 @@ public final class SudokuSolverAStar {
         openedPriorityQueue.add(instance);
         while (!openedPriorityQueue.isEmpty()) {
 
-            /**
-             * TODO TIRAR PELO AMOR DE SANTO CRISTO
-             * DEBUG*/
-
-            String debug = instance.getLeast().getCellRow() + " - " +
-                    instance.getLeast().getCellColumn() + ": " +
-                    Arrays.toString(instance.possibleValues()) + "\n" +
-                    instance.getSudoku().prettyPrint() + "\n\n";
-            System.out.println(debug);
-
             instance = openedPriorityQueue.poll();
             openedMap.remove(instance.hashCode());
             if (instance.getSudoku().isValid()) {
